@@ -20,11 +20,12 @@
         $pdo_dsn = "mysql:host=$db_host;dbname=$db_name";
 
         $pdo = new PDO($pdo_dsn, $db_user, $db_passwd);
-
-        $sql = "SELECT name FROM  times";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute();
-        $timezone = $stmt->fetchAll();   
+        
+      $q = $pdo->query("SELECT name FROM  times");
+      while($row = $q->fetch()){
+          echo "<tr><td>".$row["name"];
+      }
+      
         ?>
 
         
@@ -76,15 +77,7 @@
         }
         ?>
 
-        <?php //DATABASE STUFF
-
-          //Connect to our MySQL database using the PDO extension.
-// $pdo = new PDO('mysql:host=localhost;dbname=test', 'root', '');
-        // $sql = "SELECT id, name FROM users";
-        // $stmt = $pdo->prepare($sql);
-        // $stmt->execute();
-        // $users = $stmt->fetchAll();
-        ?>
+  
    
         <section></section>
        
