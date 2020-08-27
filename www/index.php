@@ -10,8 +10,8 @@
     <body>
 
   
-      <?php        
-        // UNCOMMENT
+      <?php    //PHP connecting to database
+
         $db_host   = '192.168.2.22';
         $db_name   = 'timezone';
         $db_user   = 'clouduser';
