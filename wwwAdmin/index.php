@@ -25,9 +25,10 @@ $timezone = $sql_q->fetchAll();
             $UTCtime = check_input($_POST["time"]);
 //            echo "ADD " . $location . " " . $UTCtime . "<br><br>";
             if(empty($location) || empty($UTCtime)){ //empty input
-                $insertionErr = "invalid/empty input";
+                $insertionErr = "empty input";
+            }else if(!preg_match("/^(?:1[012]|0[0-9]):[0-5][0-9](:[0-5][0-9])?$/", $UTCtime)){
+                $insertionErr = "invalid time";
             }else{
-
                 $sql_insert = "INSERT INTO times VALUES (:country , :utc)";
                 $stmt = $pdo->prepare($sql_insert);
                 $stmt->bindValue(":country",$location);
