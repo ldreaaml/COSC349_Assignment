@@ -48,9 +48,9 @@ end
         config.vm.define "secondVM" do |secondVM|
             secondVM.vm.hostname = "secondVM"
 
-            # run on port 80 on the guest VM, and map to port 8080 on the host
+            # run on port 80 on the guest VM, and map to port 8081 on the host
             # user only allow access via local host ip
-            secondVM.vm.network "forwarded_port", guest: 80, host: 8080, host_ip: "127.0.0.2"
+            secondVM.vm.network "forwarded_port", guest: 80, host: 8081, host_ip: "127.0.0.1"
 
     #        ping -c3 192.168.2.21
 
@@ -69,7 +69,7 @@ end
           # (Look inside test-website.conf for specifics.)
           cp /vagrant/test-website1.conf /etc/apache2/sites-available/
           # activate our website configuration ...
-          a2ensite test-website
+          a2ensite test-website1
           # ... and disable the default website provided with Apache
           a2dissite 000-default
           # Reload the webserver configuration, to pick up our changes
