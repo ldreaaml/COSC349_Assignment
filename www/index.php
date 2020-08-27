@@ -20,14 +20,12 @@
         $pdo_dsn = "mysql:host=$db_host;dbname=$db_name";
 
         $pdo = new PDO($pdo_dsn, $db_user, $db_passwd);
-        
-      $q = $pdo->query("SELECT name FROM  times");
-      while($row = $q->fetch()){
-          echo "<tr><td>".$row["name"];
-      }
-      
-        ?>
 
+        $sql_q = $pdo->prepare("SELECT name FROM  times");
+        $sql_q->execute();
+        $timezone = $sql_q->fetchAll();
+        
+    ?>
         
       <!-- PHP validating input -->
         <?php
@@ -48,15 +46,21 @@
               $valid_input = false;
             }
           }
+          if(isset($_POST[ “localTime”])){
+                $localTime =  $_POST[“localTime”];
+          }
+          if(isset($_POST[“anotherTimeZone”])){
+                $anotherTimeZone =  $_POST[“anotherTimeZone”];
+          }
           if(empty($_POST["localTime"])){
             $timeZone1Err = "Time Zone is required";
+            $valid_input =false;
           }
           if(empty($_POST["anotherTimeZone"])){
             $timeZone2Err = "Time Zone is required";
+            $valid_input = false;
           }
-          
-          
-          
+            
           $ampm = check_input($_POST["ampm"]);
           $localTime = check_input($_POST["localTime"]);
           $anotherTimeZone = check_input($_POST["anotherTimeZone"]);
@@ -82,6 +86,8 @@
         <section></section>
        
         <div id = "container">
+            
+           
            
             <h1 id="header">Time Zone Converter</h1>
            
@@ -90,7 +96,7 @@
                 <form method="post" action ="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
 
                 <div class ="clock" id ="clock1">
-        <!--      PHP :   FORM HANDLING        -->
+                        <!--    FORM HANDLING        -->
                      
                         <p>Time:</p>
                          <input type="text" name="time" class="input" placeholder="00:00" value=<?php echo date("h:i a"); ?>>
@@ -105,40 +111,28 @@
                
                 <div class ="clock" id="clock2">
                     <p>From:</p>
-                    <label for="localTime">
-                            <select class="input">
+                    <label for="timeZone1">
+                            <select class="input" name = "localTime">
                               <option selected disabled hidden>- choose time zone -</option>
-                              <?php foreach($timezone as $tz): ?>
-                                      <option value="<?= $tz['name']; ?>"></option>
-                              <?php endforeach; ?>
-                              
-<!--                          
-
- <?php foreach($timezone as $tz): ?>
-                                      <option value="<?= $tz['name']; ?>"></option>
-                                    <?php endforeach; ?>
-
--->
-                                           
-                                   
-                                    
-                            </select>           
+                                <?php foreach ($timezone as $row): ?>
+                                    <option><?=$row["name"]?></option>
+                                <?php endforeach ?>
+                            </select>
+                            <span class="error"><?php echo $timeZone1Err;?></span>
                     </label>
                     <p>To:</p>
-                    <label for="anotherTimeZone">
-                            <select class="input">
+                    <label for="timeZone2">
+                            <select class="input" name ="anotherTimeZone">
                              <option selected disabled hidden>- choose time zone -</option>
-                             <?php foreach($timezone as $tz): ?>
-                                      <option value="<?= $tz['name']; ?>"></option>
-                              <?php endforeach; ?>
-<!--                          
-                                    <?php foreach($timezone as $tz): ?>
-                                      <option value="<?= $tz['name']; ?>"><?= $user['name']; ?></option>
-                                    <?php endforeach; ?>
-                                    -->
-                            </select>           
+                                <?php foreach ($timezone as $row): ?>
+                                    <option><?=$row["name"]?></option>
+                                <?php endforeach ?>
+                            </select>
+                        <span class="error"><?php echo $timeZone2Err;?></span>
                     </label>
                 </div>
+                    
+                    
                
                
                  <div id="result">
@@ -147,14 +141,16 @@
 
                 <?php
                 if($valid_input){
-                  echo "time " . $time . " " . $ampm . " in ..." . $localTime;
+                  echo "time " . $time . " " . $ampm . " in " . $localTime;
                   echo "<br>converts to";
-                  echo "<br>... in ... " . $anotherTimeZone;
+                  echo "<br>... in " . $anotherTimeZone;
                 }
                 ?>
                      
                
                 </div>
+                    
+
                
                 <input type="submit" name="submit" class="btn" value ="Convert Time">
                 </form>
