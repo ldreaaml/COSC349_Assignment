@@ -15,7 +15,7 @@ Vagrant.configure("2") do |config|
 
         # run on port 80 on the guest VM, and map to port 8080 on the host
         # user only allow access via local host ip
-        firstVM.vm.network "forwarded_port", guest: 80, host: 8080, host_ip: "127.0.0.1"
+        firstVM.vm.network "forwarded_port", guest: 80, host: 8888, host_ip: "127.0.0.1"
 
 #        ping -c3 192.168.2.20
 
@@ -50,7 +50,7 @@ end
 
             # run on port 80 on the guest VM, and map to port 8081 on the host
             # user only allow access via local host ip
-            secondVM.vm.network "forwarded_port", guest: 80, host: 8081, host_ip: "127.0.0.1"
+            secondVM.vm.network "forwarded_port", guest: 80, host: 8889, host_ip: "127.0.0.1"
 
     #        ping -c3 192.168.2.21
 
