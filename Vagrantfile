@@ -44,10 +44,38 @@ SHELL
 end
     
     # second VM - for admin 
-    config.vm.define "secondVM" do |secondVM|
-        secondVM.vm.hostname = "secondVM"
-        secondVM.vm.network "private_network", ip: "192.168.2.21"
-        secondVM.vm.synced_folder ".","/vagrant", owner: "vagrant", group: "vagrant", mount_options: ["dmode=775,fmode=777"]
+        # second VM - for adminwebserver
+        config.vm.define "secondVM" do |secondVM|
+            secondVM.vm.hostname = "secondVM"
+
+            # run on port 80 on the guest VM, and map to port 8080 on the host
+            # user only allow access via local host ip
+            secondVM.vm.network "forwarded_port", guest: 80, host: 8080, host_ip: "127.0.0.2"
+
+    #        ping -c3 192.168.2.21
+
+            # private network for communications between multiple VMs
+            secondVM.vm.network "private_network", ip: "192.168.2.21"
+
+            # synced folder is used to share directory between host machine and guest VMs
+            secondVM.vm.synced_folder ".","/vagrant", owner: "vagrant", group: "vagrant", mount_options: ["dmode=775,fmode=777"]
+            
+            secondVM.vm.provision "shell", inline: <<-SHELL
+          #install apache package
+         apt-get update
+          apt-get install -y apache2 php libapache2-mod-php php-mysql
+                
+          # Change VM's webserver's configuration to use shared folder.
+          # (Look inside test-website.conf for specifics.)
+          cp /vagrant/test-website1.conf /etc/apache2/sites-available/
+          # activate our website configuration ...
+          a2ensite test-website
+          # ... and disable the default website provided with Apache
+          a2dissite 000-default
+          # Reload the webserver configuration, to pick up our changes
+          service apache2 reload
+
+    SHELL
         
     end
     
