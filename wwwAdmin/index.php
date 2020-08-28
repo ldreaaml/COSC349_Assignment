@@ -26,7 +26,7 @@ $timezone = $sql_q->fetchAll();
 //            echo "ADD " . $location . " " . $UTCtime . "<br><br>";
             if(empty($location) || empty($UTCtime)){ //empty input
                 $insertionErr = "empty input";
-            }else if(!preg_match("/^(?:1[012]|0[0-9]):[0-5][0-9](:[0-5][0-9])?$/", $UTCtime)){
+            }else if(!preg_match("/^([+-]?)(?:1[012]|0[0-9]):[0-5][0-9](:[0-5][0-9])?$/", $UTCtime)){
                 $insertionErr = "invalid time";
             }else{
                 $sql_insert = "INSERT INTO times VALUES (:country , :utc)";
