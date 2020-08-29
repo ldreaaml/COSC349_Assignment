@@ -1,0 +1,95 @@
+body{
+    background-color: #d8e2ed;
+    margin:0;
+}
+
+section{
+    height: 150px;
+}
+
+#header {
+    margin:0;
+    padding: 30px;
+    font-size: 60px;
+    font-family:monospace;  
+    color: #5f7d9e;
+    text-align: center;
+    
+}
+
+.error {
+     color: #f29388;
+     font-weight: 400;
+}
+
+#clock_container{
+    margin: auto;
+    width: 70%;
+    height: auto;
+    display:block;
+}
+
+.clock{
+    color:#5f7d9e;
+    font-family: monospace;
+    width:auto;
+    text-align: center;
+    height: auto;
+    vertical-align: top;
+    height: auto;
+    padding: 30px 50px;
+}
+
+#clock1{
+    border-bottom: 2px dashed #86A3C3;
+}
+
+.input{
+    width: 150px;
+    height: 30px;
+}
+
+.btn{
+    background-color: #5f7d9e;
+    border:none;
+    border-radius: 9px;
+    width: auto;
+    height: auto;
+    padding: 15px 20px;
+    display: block;
+    margin:auto;
+    color: #d8e2ed;
+    font-size:15px;
+    font-weight: 600
+}
+
+.rbtn{
+    display: inline-block;
+    font-size: 20px;
+    margin-left: 10px;
+}
+
+p{
+    font-size: 20px;
+    font-family:monospace;  
+    line-height: 0px;
+    width: 50px;
+    display: inline-block;
+}
+
+#result{
+    padding: 30px 10px;
+    font-size: 20px;
+    font-family:monospace; 
+    line-height: 1.7;    
+    text-align: center; 
+    font-weight: 600;
+     color: #5f7d9e;
+}
+
+
+input[type=text] {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-left:10px;
+}

@@ -1,4 +1,4 @@
-<?php
+<?php  //connecting to database
 
 $db_host   = '192.168.2.22';
 $db_name   = 'timezone';
@@ -14,20 +14,20 @@ $timezone = $sql_q->fetchAll();
 ?>
 
 <?php
-
+    
     $location = $del_location = $UTCtime = "";
     $locationErr = $UTCtimeErr = $insertionErr = "";
 
     if($_SERVER["REQUEST_METHOD"] == "POST"){
 
-        if(isset($_POST["submit_add"])){ //INSERT
+        //Inserting data to database
+        if(isset($_POST["submit_add"])){ 
             $location = check_input($_POST["location"]);
             $UTCtime = check_input($_POST["time"]);
-//            echo "ADD " . $location . " " . $UTCtime . "<br><br>";
             if(empty($location) || empty($UTCtime)){ //empty input
-                $insertionErr = "empty input";
-            }else if(!preg_match("/^([+-]?)(?:1[012]|0[0-9]):[0-5][0-9](:[0-5][0-9])?$/", $UTCtime)){
-                $insertionErr = "invalid time";
+                $insertionErr = "*Empty input";
+            }else if(!preg_match("/^([+-]?)(?:1[012]|0?[0-9]):[0-5][0-9](:[0-5][0-9])?$/", $UTCtime)){
+                $insertionErr = "*Invalid time input";
             }else{
                 $sql_insert = "INSERT INTO times VALUES (:country , :utc)";
                 $stmt = $pdo->prepare($sql_insert);
@@ -41,7 +41,9 @@ $timezone = $sql_q->fetchAll();
                 }
             }
         }
-        if(isset($_POST["submit_delete"])){ //DELETE
+        
+        //Delete data from database
+        if(isset($_POST["submit_delete"])){ 
             $del_location = check_input($_POST["timeZone"]);
             $sql_delete = "DELETE FROM times WHERE name = :key";
             $stmt = $pdo->prepare($sql_delete);
@@ -65,42 +67,47 @@ function check_input($data){
     <head>
         <title>TimeZone Converter</title>
     </head>
-    <style>
-        .error {color: #FF0000;}
-    </style>
+    <link rel="stylesheet" href ="index.css">
+    
     <body>
         
-        <p> doing stuff with database</p>
+        <div id="header"> Time Zone Converter Database </div>
         
-        <p> ============================= </p>
-        
+<!--        Insert new timezone-->
+        <div id ="db">
+            
+        <div id="insert">
         <form method ="post"  action ="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
-            <p> add new time zone </p>
-            <input type="text" name="location" class="input" placeholder="location" value="test">
-            <input type="text" name="time" class="input" placeholder="&plusmn;00:00 (UTC time)" value="+12:34">
-            <input type="submit" name="submit_add" class="btn" value ="add time zone">
+            <p>Add Time Zone</p>
+            <input type="text" name="location" class="input" placeholder="Location" >
+            <input type="text" name="time" class="input" placeholder="&plusmn;00:00 (UTC time)" >
+            <input type="submit" name="submit_add" class="btn" value ="ADD">
             <span class="error"><?php echo $insertionErr;?></span>
         </form>
+        </div>
         
+<!--        Delete timezone-->
+        <div id="delete">
         <form method = "post"  action ="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
-            <p> delete time zone </p>
+            <p>Delete Time Zone</p>
              <label for="timeZone">
-                            <select class="input" name ="timeZone">
+                            <select class="list" name ="timeZone">
                              <option selected disabled hidden>- choose time zone -</option>
                                 <?php foreach ($timezone as $row): ?>
                                     <option><?=$row["name"]?></option>
                                 <?php endforeach ?>
--->
+
                             </select>
             </label>
-            <input type="submit" name="submit_delete" class="btn" value ="delete time zone">
+            <input type="submit" name="submit_delete" class="btn" value ="DELETE">
         </form>
+        </div>
+            
+        </div>
         
 <!--        DISPLAY DATABASE-->
-        <p>Time Zone Database</p>
             <table border="1">
-                <tr><th>Location</th><th>UTC time</th></tr>
-
+                <tr><th>Locations</th><th>UTC time</th></tr>
                 <?php
                 $q = $pdo->query("SELECT * FROM times");
                 while($row = $q->fetch()){

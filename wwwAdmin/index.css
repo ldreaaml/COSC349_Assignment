@@ -1,0 +1,88 @@
+body{
+    background-color: #d8e2ed;
+    margin:0;
+}
+
+#header {
+    padding: 80px 0px 50px 0px;
+    font-size: 40px;
+    font-family:sans-serif,monospace;  
+    font-weight:600;
+    color: #5f7d9e;
+    text-align: center;
+}
+
+.error {
+     color: #f29388;
+     font-weight: 400;
+     font-size: 12px;
+     font-family:monospace; 
+     margin-left: 5px;
+}
+
+#delete{
+    margin: 50px 0px;
+}
+
+#db{
+    height:auto;
+    margin:auto;
+    text-align: center;
+}
+
+
+.input{
+    width: 150px;
+    height: 30px;
+}
+
+.btn{
+    background-color: #81a3c7;
+    border:none;
+    border-radius: 4px;
+    width: auto;
+    height: auto;
+    padding: 7px 10px;
+    margin-left : 10px;
+    color: #d8e2ed;
+    font-size:10px;
+}
+
+
+p{
+    font-size: 20px;
+    color: #5f7d9e;
+    font-family:sans-serif, monospace;  
+}
+
+
+input[type=text] {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-left:10px;
+}
+
+table{
+    font-family:sans-serif;
+    width:  400px;
+    margin:auto;
+    background-color: white;
+    border: 1px solid #4f6680;
+    border-collapse: collapse;
+}
+th{
+    border:none;
+    text-align: left;
+    background-color: #5f7d9e;
+    color: white;
+    height: 50px;
+    padding: 0px 15px;
+}
+
+td{    
+    padding: 5px 15px;
+    border:none;
+    height:20px;
+}
+
+tr:nth-child(even) {background-color: #edf1f5;}

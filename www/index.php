@@ -11,8 +11,7 @@ $pdo = new PDO($pdo_dsn, $db_user, $db_passwd);
 
 $sql_q = $pdo->prepare("SELECT name FROM  times");
 $sql_q->execute();
-$timezone = $sql_q->fetchAll();
-
+$timezone = $sql_q->fetchAll(); //get timezone from database
 ?>
 
 <?php // validating input
@@ -28,34 +27,27 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
     $localTime = check_input($_POST["localTime"]);
     $anotherTimeZone = check_input($_POST["anotherTimeZone"]);
     $valid_input = true;
-    //fix plz u-u
+    
     if(empty($_POST["time"])){
-        $timeErr = "Time is required";
+        $timeErr = "*Time is required";
         $valid_input = false;
     }else{
         $time = check_input($_POST["time"]);
-        if(!preg_match("/^(?:1[012]|0[0-9]):[0-5][0-9](:[0-5][0-9])?$/", $time)){
-            $timeErr = "invalid time";
+        if(!preg_match("/^(?:1[012]|0?[0-9]):[0-5][0-9](:[0-5][0-9])?$/", $time)){
+            $timeErr = "*Invalid time input";
             $valid_input = false;
         }
     }
-    if(isset($_POST[ “localTime”])){
-        $localTime =  $_POST[“localTime”];
-    }
-    if(isset($_POST[“anotherTimeZone”])){
-        $anotherTimeZone =  $_POST[“anotherTimeZone”];
-    }
     if(empty($_POST["localTime"])){
-        $timeZone1Err = "Time Zone is required";
+        $timeZone1Err = "*Time Zone is required";
         $valid_input =false;
     }
     if(empty($_POST["anotherTimeZone"])){
-        $timeZone2Err = "Time Zone is required";
+        $timeZone2Err = "*Time Zone is required";
         $valid_input = false;
     }
     
-    if(valid_input){ //if all input is valid
-        
+    if(valid_input){ //if all input is valid , query data        
         $sql_search = "SELECT timeDifference FROM times WHERE name = :key";
         $stmt = $stmt = $pdo->prepare($sql_search);
         $stmt->execute([':key' => $localTime]);
@@ -64,47 +56,49 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
         $utc2 = $stmt->fetch();
         
         $timeAfterConversion = convertTime($utc1['timeDifference'],$utc2['timeDifference'],$ampm,$time);
-        
         $result = $time." ".$ampm." in ". $localTime . " (" . $utc1['timeDifference'] . ")"
 . "<br>converts to<br>" . $timeAfterConversion ." in ". $anotherTimeZone ." (". $utc2['timeDifference'].")" ;
               
     }     
 }
 
+//convert time from one UTC to another UTC
 function convertTime($timezone1, $timezone2, $ampm, $cur_time){
 
     $time =  preg_split("/[\:\+\-\s]+/",$cur_time,-1,PREG_SPLIT_NO_EMPTY);
-    //  print_r($time);
-
     $sign1 = $sign2 = 1;
     if(preg_match("/[\-]/",$timezone1)){
         $sign1 = -1;
     }
     $utc1 = preg_split("/[\:\+\-\s]+/",$timezone1,-1,PREG_SPLIT_NO_EMPTY);
-    // print_r($utc1);
-
     if(preg_match("/[\-]/",$timezone2)){
         $sign2 = -1;
     }
     $utc2 = preg_split("/[\:\+\-\s]+/",$timezone2,-1,PREG_SPLIT_NO_EMPTY);
-    // print_r($utc2);
 
     $timeDiff = ($utc2[0]*$sign2) - ($utc1[0]*$sign1);
-//     echo "<br># ".($utc2[0]*$sign2) . " - " .($utc1[0]*$sign1)." = ". $timeDiff;
     $minDiff = ($utc2[1]*$sign2) - ($utc1[1]*$sign1);
-    // echo "<br>#" . $minDiff;
-
-    $timeAfterConversion = $time[0] + $timeDiff;
-    if($timeAfterConversion<0){
-      $timeAfterConversion += 24;
-//      echo "- ".$timeAfterConversion;
+    
+    $hour = $time[0] + $timeDiff;
+    $min = $time[1] + $minDiff;
+    if($min<0){
+      $hour -= 1;
+      $min += 60;
     }
-    if($timeAfterConversion > 12){
-      $timeAfterConversion = $timeAfterConversion%12;
+    if($min >= 60){
+      $hour++;
+      $min = $min%60;
+    }
+    if($hour<0){
+      $hour += 24;
+    }    
+    if($hour > 12){
+      $hour = $hour%12;
       $ampm = ($ampm == "AM"?"PM":"AM");         
     }
-//     echo "<br>== " . $timeAfterConversion.":".$time[1]." ".$ampm; 
-    return $timeAfterConversion.":".$time[1]." ".$ampm;
+    $hour = sprintf("%02d", $hour);
+    $min = sprintf("%02d", $min);
+    return $hour.":".$min." ".$ampm;
 }
 
 function check_input($data){
@@ -113,14 +107,6 @@ function check_input($data){
     $data = htmlspecialchars($data);
     return $data;
 }
-
-function check_time($time){
-    $time = trim($time);
-    if(preg_match("/^(?:1[012]|0[0-9]):[0-5][0-9]$/", $time) == 1){
-        return $time;
-    }
-}
-
 
 ?>
 
@@ -131,9 +117,7 @@ function check_time($time){
         <title>TimeZone Converter</title>
         <link rel="stylesheet" href ="index.css">
     </head>
-    <style>
-  .error {color: #FF0000;}
-    </style>
+    <link rel="stylesheet" href ="index.css">
     <body>
    
         <section></section>
@@ -159,11 +143,11 @@ function check_time($time){
                
 <!--               TIME ZONE INPUT-->
                 <div class ="clock" id="clock2">
-                    <p>From:</p>
-                    <label for="timeZone1">
+                    <p>From: </p>
+                    <label for="timeZone1"> 
+                        <!--Drop down list of timezone-->
                             <select class="input" name = "localTime">
-                              <option selected disabled hidden>- choose time zone -</option>
-                                <?php foreach ($timezone as $row): ?>
+                                <?php foreach ($timezone as $row): ?> 
                                     <option><?=$row["name"]?></option>
                                 <?php endforeach ?>
                             </select>
@@ -172,8 +156,8 @@ function check_time($time){
 
                     <p>To:</p>
                     <label for="timeZone2">
+                        <!--Drop down list of timezone-->
                             <select class="input" name ="anotherTimeZone">
-                             <option selected disabled hidden>- choose time zone -</option>
                                 <?php foreach ($timezone as $row): ?>
                                     <option><?=$row["name"]?></option>
                                 <?php endforeach ?>
@@ -182,15 +166,15 @@ function check_time($time){
                     </label>
                 </div>
 
-               
-                 <div id="result">
+               <!--Display result of time conversion-->
+                 <div id="result"> 
                     <?php
                         if($valid_input){
                             echo $result;
                         }                     
                     ?>
                 </div>
-
+                    
                 <input type="submit" name="submit" class="btn" value ="Convert Time">
                 </form>
             </div>
