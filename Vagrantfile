@@ -2,39 +2,33 @@
 # vi: set ft=ruby :
 
 # All Vagrant configuration is done below. The "2" in Vagrant.configure
-# configures the configuration version (we support older styles for
-# backwards compatibility). Please don't change it unless you know what
-# you're doing.
 Vagrant.configure("2") do |config|
     
     config.vm.box = "ubuntu/xenial64"
  
-    # first VM - for webserver
-    config.vm.define "firstVM" do |firstVM|
-        firstVM.vm.hostname = "firstVM"
+    # first VM for client webserver
+    config.vm.define "webserver" do |webserver|
+        webserver.vm.hostname = "webserver"
 
         # run on port 80 on the guest VM, and map to port 8080 on the host
         # user only allow access via local host ip
-        firstVM.vm.network "forwarded_port", guest: 80, host: 8888, host_ip: "127.0.0.1"
+        webserver.vm.network "forwarded_port", guest: 80, host: 8888, host_ip: "127.0.0.1"
 
-#        ping -c3 192.168.2.20
-
-        # private network for communications between multiple VMs
-        firstVM.vm.network "private_network", ip: "192.168.2.20"
+        # webserver network for communications between multiple VMs
+        webserver.vm.network "private_network", ip: "192.168.2.20"
 
         # synced folder is used to share directory between host machine and guest VMs
-        firstVM.vm.synced_folder ".","/vagrant", owner: "vagrant", group: "vagrant", mount_options: ["dmode=775,fmode=777"]
+        webserver.vm.synced_folder ".","/vagrant", owner: "vagrant", group: "vagrant", mount_options: ["dmode=775,fmode=777"]
         
-        firstVM.vm.provision "shell", inline: <<-SHELL
+        webserver.vm.provision "shell", inline: <<-SHELL
       #install apache package
      apt-get update
       apt-get install -y apache2 php libapache2-mod-php php-mysql
             
       # Change VM's webserver's configuration to use shared folder.
-      # (Look inside test-website.conf for specifics.)
-      cp /vagrant/test-website.conf /etc/apache2/sites-available/
+      cp /vagrant/user-website.conf /etc/apache2/sites-available/
       # activate our website configuration ...
-      a2ensite test-website
+      a2ensite user-website.conf
       # ... and disable the default website provided with Apache
       a2dissite 000-default
       # Reload the webserver configuration, to pick up our changes
@@ -43,48 +37,44 @@ Vagrant.configure("2") do |config|
 SHELL
 end
     
-    # second VM - for admin 
-        # second VM - for adminwebserver
-        config.vm.define "secondVM" do |secondVM|
-            secondVM.vm.hostname = "secondVM"
+        # second VM for adminwebserver
+        config.vm.define "adminserver" do |adminserver|
+            adminserver.vm.hostname = "adminserver"
 
             # run on port 80 on the guest VM, and map to port 8081 on the host
             # user only allow access via local host ip
-            secondVM.vm.network "forwarded_port", guest: 80, host: 8889, host_ip: "127.0.0.1"
-
-    #        ping -c3 192.168.2.21
+            adminserver.vm.network "forwarded_port", guest: 80, host: 8889, host_ip: "127.0.0.1"
 
             # private network for communications between multiple VMs
-            secondVM.vm.network "private_network", ip: "192.168.2.21"
+            adminserver.vm.network "private_network", ip: "192.168.2.21"
 
             # synced folder is used to share directory between host machine and guest VMs
-            secondVM.vm.synced_folder ".","/vagrant", owner: "vagrant", group: "vagrant", mount_options: ["dmode=775,fmode=777"]
+            adminserver.vm.synced_folder ".","/vagrant", owner: "vagrant", group: "vagrant", mount_options: ["dmode=775,fmode=777"]
             
-            secondVM.vm.provision "shell", inline: <<-SHELL
+            adminserver.vm.provision "shell", inline: <<-SHELL
           #install apache package
          apt-get update
           apt-get install -y apache2 php libapache2-mod-php php-mysql
                 
           # Change VM's webserver's configuration to use shared folder.
-          # (Look inside test-website.conf for specifics.)
-          cp /vagrant/test-website1.conf /etc/apache2/sites-available/
+          cp /vagrant/admin-website.conf /etc/apache2/sites-available/
           # activate our website configuration ...
-          a2ensite test-website1
+          a2ensite admin-website.conf
           # ... and disable the default website provided with Apache
           a2dissite 000-default
           # Reload the webserver configuration, to pick up our changes
           service apache2 reload
 
-    SHELL
+SHELL
         
     end
     
-    # third VM- for db
-    config.vm.define "thirdVM" do |thirdVM|
-        thirdVM.vm.hostname = "third-machine"
-        thirdVM.vm.network "private_network", ip: "192.168.2.22"
-        thirdVM.vm.synced_folder ".","/vagrant", owner: "vagrant", group: "vagrant", mount_options: ["dmode=775,fmode=777"]
-thirdVM.vm.provision "shell", inline: <<-SHELL
+    # third VM for database
+    config.vm.define "dbserver" do |dbserver|
+        dbserver.vm.hostname = "third-machine"
+        dbserver.vm.network "private_network", ip: "192.168.2.22"
+        dbserver.vm.synced_folder ".","/vagrant", owner: "vagrant", group: "vagrant", mount_options: ["dmode=775,fmode=777"]
+dbserver.vm.provision "shell", inline: <<-SHELL
       # Update Ubuntu software packages.
       apt-get update
       
@@ -139,7 +129,7 @@ thirdVM.vm.provision "shell", inline: <<-SHELL
       # We then restart the MySQL server to ensure that it picks up
       # our configuration changes.
       service mysql restart
-    SHELL
+SHELL
    
  end
 
