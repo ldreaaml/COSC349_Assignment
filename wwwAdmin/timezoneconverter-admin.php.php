@@ -1,6 +1,7 @@
 <?php  //connecting to database
 
-$db_host   = '192.168.2.22';
+//$db_host   = '192.168.2.22';
+$db_host   = 'cosc349-timezone-converter.cy2m5ixvr76y.us-east-1.rds.amazonaws.com'; //set AWS RDS to be the new host 
 $db_name   = 'timezone';
 $db_user   = 'clouduser';
 $db_passwd = 'insecure_db_pw';
